@@ -3,7 +3,7 @@ services:
   traefik:
     container_name: traefik
     image: traefik:latest
-    restart: always
+    restart: unless-stopped
 
     command:
       - --api.insecure=true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
@@ -27,7 +27,7 @@ services:
       - --certificatesresolvers.mytlschallenge.acme.email=${ACME_EMAIL} # <== Setting email for certs
       - --certificatesresolvers.mytlschallenge.acme.storage=/certs/acme.json # <== Defining acme file to store cert information
       # during development
-      - --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.mytlschallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
 
     labels:
       #### Labels define the behavior and rules of the traefik proxy for this container ####
@@ -49,39 +49,39 @@ services:
       - "8080:8080"
       - "443:443"
 
-  app:
-    build:
-      context: ./server
-    container_name: server
-    restart: always
+  nodejs:
+    build: ./nodejs
+    container_name: nodejs
+    restart: unless-stopped
 
-    healthcheck:
-      test: curl http://127.0.0.1:3000 -s -f -o /dev/null || exit 1
-      interval: 10s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: curl http://127.0.0.1:3000 -s -f -o /dev/null || exit 1
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 3
 
     labels:
       - "traefik.frontend.rule=HOST:${SERVER_DOMAINS}"
       - "traefik.port=3000"
-      - "traefik.enable=true"
-      - "traefik.backend.healthcheck.path=/"
-      - "traefik.backend.healthcheck.interval=10s"
-      - "traefik.backend.healthcheck.timeout=10s"
+      # - "traefik.backend.healthcheck.path=/"
+      # - "traefik.backend.healthcheck.interval=10s"
+      # - "traefik.backend.healthcheck.timeout=10s"
 
-    labels:
       #### Labels define the behavior and rules of the traefik proxy for this container ####
       - "traefik.enable=true" # <== Enable traefik to proxy this container
       - "traefik.http.routers.express-web.rule=Host(`${DOMAIN_URL}`)" # <== Your Domain Name goes here for the http rule
+      # - "traefik.frontend.rule=PathPrefix: /api"
       - "traefik.http.routers.express-web.entrypoints=web" # <== Defining the entrypoint for http, **ref: line 30
+
       - "traefik.http.routers.express-web.middlewares=redirect@file" # <== This is a middleware to redirect to https
-      - "traefik.http.routers.express-secured.rule=Host(`${DOMAIN_URL}`)" # <== Your Domain Name for the https rule 
+
+      - "traefik.http.routers.express-secured.rule=Host(`${DOMAIN_URL}`)" # <== Your Domain Name for the https rule
       - "traefik.http.routers.express-secured.entrypoints=web-secured" # <== Defining entrypoint for https, **ref: line 31
       - "traefik.http.routers.express-secured.tls.certresolver=mytlschallenge" # <== Defining certsresolvers for https
 
     volumes:
-      - server/:/app/
-      - /app/node_modules
+      - ./nodejs:/app
+      - nodejs-node_modules:/app/node_modules
 
     networks:
       - web
@@ -91,5 +91,4 @@ networks:
     external: true
 
 volumes:
-  server:
-    external: true
+  nodejs-node_modules:

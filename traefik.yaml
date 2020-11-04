@@ -1,0 +1,47 @@
+log:
+  # Log Settings (options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO)
+  # https://docs.traefik.io/observability/logs/
+  level: DEBUG
+
+  
+# Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+entryPoints:
+  web:
+    address: :80 # <== Defining an entrypoint for port :80 named web
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: :443 # <== Defining an entrypoint for https on port :443 named websecure
+ 
+# Certificate Settings (Let's Encrypt) - https://docs.traefik.io/https/acme/#configuration-examples ##
+certificatesResolvers:
+  mytlschallenge:
+    acme:
+      email: "caruso33@web.de"
+      storage: "/certs/acme.json"
+      tlsChallenge: true
+      # during development
+      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
+  
+
+api:
+  insecure: true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+  dashboard: true # <== Enabling the dashboard to view services, middlewares, routers, etc...
+  debug: true # <== Enabling additional endpoints for debugging and profiling
+
+# pilot:
+#   token: ""
+
+# Provider Settings - https://docs.traefik.io/providers/docker/#provider-configuration ##
+providers:
+  docker:
+    exposedByDefault: false
+    network: "traefik-proxy" # <== Operate on the docker network named traefik-proxy
+    # this is really important when you have multiple networks on a single container. 
+    # This will tell Traefik to always look for network traefik-proxy and not any other internal networks.
+  file: 
+    filename: /dynamic.yaml # <== Referring to a dynamic configuration file

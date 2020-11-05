@@ -14,7 +14,7 @@ services:
     labels:
       #### Labels define the behavior and rules of the traefik proxy for this container ####
       - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_MONITOR_URL}`)" # <== Setting the domain for the dashboard
+      - "traefik.http.routers.traefik.rule=Host(`monitor.${DOMAIN_URL}`)" # <== Setting the domain for the dashboard
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls.certresolver=mytlschallenge"
       - "traefik.http.routers.traefik.service=api@internal" # <== Enabling the api to be a service to access
@@ -29,10 +29,10 @@ services:
       - "80:80"
       - "443:443"
 
-  # nodejs:
-  #   build: ./nodejs
-  #   container_name: nodejs
-  #   restart: unless-stopped
+  nodejs:
+    build: ./nodejs
+    container_name: nodejs
+    restart: unless-stopped
 
   #   # healthcheck:
   #   #   test: curl http://127.0.0.1:3000 -s -f -o /dev/null || exit 1
@@ -40,36 +40,70 @@ services:
   #   #   timeout: 10s
   #   #   retries: 3
 
-  #   labels:
-  #     - "traefik.frontend.rule=HOST:${SERVER_DOMAINS}"
-  #     # - "traefik.port=3000"
-  #     # - "traefik.backend.healthcheck.path=/"
-  #     # - "traefik.backend.healthcheck.interval=10s"
-  #     # - "traefik.backend.healthcheck.timeout=10s"
+    labels:
+      #### Labels define the behavior and rules of the traefik proxy for this container ####
+      - "traefik.enable=true" # <== Enable traefik to proxy this container
+      # - "traefik.frontend.rule=PathPrefix: /api"
 
-  #     #### Labels define the behavior and rules of the traefik proxy for this container ####
-  #     - "traefik.enable=true" # <== Enable traefik to proxy this container
-  #     - "traefik.http.routers.express-web.rule=Host(`${DOMAIN_URL}`)" # <== Your Domain Name goes here for the http rule
-  #     # - "traefik.frontend.rule=PathPrefix: /api"
-  #     - "traefik.http.routers.express-web.entrypoints=web" # <== Defining the entrypoint for http, **ref: line 30
+      - "traefik.http.routers.nodejs.rule=Host(`api.${DOMAIN_URL}`)" # <== Your Domain Name for the https rule
+      - "traefik.http.routers.nodejs.entrypoints=websecure" # <== Defining entrypoint for https, **ref: line 31
+      - "traefik.http.routers.nodejs.tls.certresolver=mytlschallenge" # <== Defining certsresolvers for https
 
-  #     - "traefik.http.routers.express-web.middlewares=redirect@file" # <== This is a middleware to redirect to https
+      # - "traefik.backend.healthcheck.path=/"
+      # - "traefik.backend.healthcheck.interval=10s"
+      # - "traefik.backend.healthcheck.timeout=10s"
 
-  #     - "traefik.http.routers.express-secured.rule=Host(`${DOMAIN_URL}`)" # <== Your Domain Name for the https rule
-  #     - "traefik.http.routers.express-secured.entrypoints=websecure" # <== Defining entrypoint for https, **ref: line 31
-  #     - "traefik.http.routers.express-secured.tls.certresolver=mytlschallenge" # <== Defining certsresolvers for https
+    volumes:
+      - /app/node_modules
+      - ./nodejs:/app
 
-  #   volumes:
-  #     - ./nodejs:/app
-  #     - nodejs-node_modules:/app/node_modules
+    networks:
+      - traefik-proxy
 
-  #   networks:
-  #     - traefik-proxy
+  flask:
+    build: ./flask
+    container_name: flask
+    restart: unless-stopped
+
+    labels:
+      - "traefik.enable=true" # <== Enable traefik to proxy this container
+      - "traefik.http.routers.flask.rule=Host(`api.blog.${DOMAIN_URL}`)" # <== Your Domain Name for the https rule
+      - "traefik.http.routers.flask.entrypoints=websecure" # <== Defining entrypoint for https, **ref: line 31
+      - "traefik.http.routers.flask.tls.certresolver=mytlschallenge" # <== Defining certsresolvers for https
+
+    volumes:
+      - ./flask:/app
+
+    networks:
+      - traefik-proxy
+
+  reactjs:
+    container_name: reactjs
+    build:
+      context: ./reactjs
+      dockerfile: Dockerfile
+
+    depends_on:
+      - nodejs
+
+    networks:
+      - traefik-proxy
+    
+    volumes:
+      - /app/node_modules # use containers node_modules
+      - ./reactjs:/app
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.reactjs.rule=Host(`${DOMAIN_URL}`)" # domain to expose on
+      - "traefik.http.routers.reactjs.entrypoints=websecure" # if you named your 443 entrypoint differently than webscure, substitute it here!
+      - "traefik.http.routers.reactjs.tls.certresolver=mytlschallenge"
+
 
 networks:
   traefik-proxy:
     name: traefik-proxy
     external: true
 
-volumes:
-  nodejs-node_modules:
+# volumes:
+#   nodejs-node_modules:

@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 
-# EXPOSE 5000
+EXPOSE 5000
 
 CMD ["python", "main.py"]

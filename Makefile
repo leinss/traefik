@@ -1,21 +1,24 @@
 build: 
-	@echo "Start building containers"
+	@echo "start building containers"
 	docker-compose build
 
 dev: 
-	@echo "Start dev mode"
+	@echo "start dev mode"
 	docker-compose --env-file ./config/.env.env -f docker-compose.yaml -f docker-compose.dev.yaml up
 
 prod: 
-	@echo "Start prod mode"
+	@echo "start prod mode"
 	docker-compose --env-file ./config/.env.prod -f docker-compose.yaml -f docker-compose.prod.yaml up
 
 stop: 
 	@echo "stop containers"
 	@docker stop $$(docker ps -a -q)
 
+include ./config/.env.prod
 deploy: 
-	docker-compose -H "ssh://user@domain" --env-file ./config/.env.prod -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+	@echo "deploy containers"
+	@docker-compose -H "ssh://$(DOMAIN_USER)@$(DOMAIN_URL)" --env-file ./config/.env.prod -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 
 logs: 
+	@echo $(ACME_EMAIL)
 	@docker-compose logs -f

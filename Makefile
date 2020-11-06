@@ -1,13 +1,14 @@
-prod: prod-multi prod-traefik prod-ghost
+prod: prod-traefik prod-multi $\
+		prod-ghost
 	@echo "running prod"
-	
-prod-multi: 
-	@echo "prod multi"
-	@cd multi-container && make prod
 
 prod-traefik:
 	@echo "prod traefik"
 	@cd traefik && make prod
+	
+prod-multi: 
+	@echo "prod multi"
+	@cd multi-container && make prod
 
 prod-ghost:
 	@echo "prod ghost"

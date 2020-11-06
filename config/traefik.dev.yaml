@@ -1,0 +1,24 @@
+log:
+  # Log Settings (options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO)
+  # https://docs.traefik.io/observability/logs/
+  level: DEBUG
+
+# Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+entryPoints:
+  web:
+    address: :80 # <== Defining an entrypoint for port :80 named web
+
+api:
+  insecure: true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+  dashboard: true # <== Enabling the dashboard to view services, middlewares, routers, etc...
+  debug: true # <== Enabling additional endpoints for debugging and profiling
+
+# Provider Settings - https://docs.traefik.io/providers/docker/#provider-configuration ##
+providers:
+  docker:
+    exposedByDefault: false
+    network: "traefik-proxy" # <== Operate on the docker network named traefik-proxy
+    # this is really important when you have multiple networks on a single container.
+    # This will tell Traefik to always look for network traefik-proxy and not any other internal networks.
+  file:
+    filename: /dynamic.yaml # <== Referring to a dynamic configuration file

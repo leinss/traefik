@@ -3,7 +3,6 @@ log:
   # https://docs.traefik.io/observability/logs/
   level: DEBUG
 
-  
 # Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
 entryPoints:
   web:
@@ -16,17 +15,16 @@ entryPoints:
 
   websecure:
     address: :443 # <== Defining an entrypoint for https on port :443 named websecure
- 
+
 # Certificate Settings (Let's Encrypt) - https://docs.traefik.io/https/acme/#configuration-examples ##
 certificatesResolvers:
   mytlschallenge:
     acme:
       email: "caruso33@web.de"
-      storage: "/certs/acme.json"
-      tlsChallenge: true
+      storage: "/config/acme.json"
+      tlsChallenge: {}
       # during development
       caserver: https://acme-staging-v02.api.letsencrypt.org/directory
-  
 
 api:
   insecure: true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
@@ -41,7 +39,7 @@ providers:
   docker:
     exposedByDefault: false
     network: "traefik-proxy" # <== Operate on the docker network named traefik-proxy
-    # this is really important when you have multiple networks on a single container. 
+    # this is really important when you have multiple networks on a single container.
     # This will tell Traefik to always look for network traefik-proxy and not any other internal networks.
-  file: 
+  file:
     filename: /dynamic.yaml # <== Referring to a dynamic configuration file

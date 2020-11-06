@@ -1,3 +1,4 @@
 node_modules
 config/acme.json
-.env
+config/.env.dev
+config/.env.prod

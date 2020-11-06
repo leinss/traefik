@@ -1,25 +1,12 @@
 version: "3.5"
 services:
   traefik:
-    container_name: traefik
-    image: traefik:latest
-    restart: unless-stopped
-
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # <== Volume for docker admin
-      - ./config:/config # <== Volume for configs (TLS)
       - ./config/traefik.dev.yaml:/etc/traefik/traefik.yaml
-      # - ./config/dynamic.yaml:/dynamic.yaml # <== Volume for dynamic conf file
 
     labels:
       #### Labels define the behavior and rules of the traefik proxy for this container ####
-      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-      - "traefik.http.routers.traefik.rule=Host(`monitor.${DOMAIN_URL}`)" # <== Setting the domain for the dashboard
       - "traefik.http.routers.traefik.entrypoints=web"
-      - "traefik.http.routers.traefik.service=api@internal" # <== Enabling the api to be a service to access
-
-    networks:
-      - traefik-proxy # <== Placing traefik on the network named traefik-proxy, to access containers on this network
 
     ports:
       - "80:80"
@@ -28,42 +15,18 @@ services:
     build:
       context: ./nodejs
       dockerfile: Dockerfile.dev
-    container_name: nodejs
-    restart: unless-stopped
 
     labels:
       #### Labels define the behavior and rules of the traefik proxy for this container ####
-      - "traefik.enable=true" # <== Enable traefik to proxy this container
-      # - "traefik.frontend.rule=PathPrefix: /api"
-
-      - "traefik.http.routers.nodejs.rule=Host(`api.${DOMAIN_URL}`)" # <== Your Domain Name for the https rule
       - "traefik.http.routers.nodejs.entrypoints=web"
-
-    volumes:
-      - /app/node_modules
-      - ./nodejs:/app
-
-    networks:
-      - traefik-proxy
 
   flask:
     build: ./flask
-    container_name: flask
-    restart: unless-stopped
 
     labels:
-      - "traefik.enable=true" # <== Enable traefik to proxy this container
-      - "traefik.http.routers.flask.rule=Host(`api.blog.${DOMAIN_URL}`)" # <== Your Domain Name for the https rule
       - "traefik.http.routers.flask.entrypoints=web"
 
-    volumes:
-      - ./flask:/app
-
-    networks:
-      - traefik-proxy
-
   reactjs:
-    container_name: reactjs
     build:
       context: ./reactjs
       dockerfile: Dockerfile.dev
@@ -79,13 +42,4 @@ services:
       - ./reactjs:/app
 
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.reactjs.rule=Host(`${DOMAIN_URL}`)" # domain to expose on
       - "traefik.http.routers.reactjs.entrypoints=web"
-
-networks:
-  traefik-proxy:
-    name: traefik-proxy
-    external: true
-# volumes:
-#   nodejs-node_modules:

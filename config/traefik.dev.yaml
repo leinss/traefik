@@ -20,5 +20,3 @@ providers:
     network: "traefik-proxy" # <== Operate on the docker network named traefik-proxy
     # this is really important when you have multiple networks on a single container.
     # This will tell Traefik to always look for network traefik-proxy and not any other internal networks.
-  file:
-    filename: /dynamic.yaml # <== Referring to a dynamic configuration file

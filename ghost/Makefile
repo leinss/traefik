@@ -14,7 +14,7 @@ stop:
 	@echo "stop containers"
 	@docker stop $$(docker ps -a -q)
 
-include ./config/.env
+include .env
 deploy: 
 	@echo "deploy containers"
 	@docker-compose -H "ssh://$(DOMAIN_USER)@$(DOMAIN_URL)" up -d

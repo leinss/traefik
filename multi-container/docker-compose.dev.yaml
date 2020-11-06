@@ -1,16 +1,5 @@
 version: "3.5"
 services:
-  traefik:
-    volumes:
-      - ./config/traefik.dev.yaml:/etc/traefik/traefik.yaml
-
-    labels:
-      #### Labels define the behavior and rules of the traefik proxy for this container ####
-      - "traefik.http.routers.traefik.entrypoints=web"
-
-    ports:
-      - "80:80"
-
   nodejs:
     build:
       context: ./nodejs

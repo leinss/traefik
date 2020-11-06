@@ -4,7 +4,7 @@ build:
 
 dev: 
 	@echo "start dev mode"
-	docker-compose --env-file ./config/.env.env -f docker-compose.yaml -f docker-compose.dev.yaml up
+	docker-compose --env-file ./config/.env.dev -f docker-compose.yaml -f docker-compose.dev.yaml up -d
 
 prod: 
 	@echo "start prod mode"

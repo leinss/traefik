@@ -1,0 +1,21 @@
+version: "3.5"
+services:
+  ghost:
+    container_name: ghost
+    image: ghost:latest
+    restart: unless-stopped
+
+    environment:
+      - url=https://blog.${DOMAIN_URL}
+
+    volumes:
+      - /data:/var/lib/ghost/content
+
+    labels:
+      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+      - "traefik.port=2368"
+      - "traefik.http.routers.ghost.entrypoints=web" # <== Defining entrypoint for https
+      - "traefik.http.routers.ghost.rule=Host(`blog.${DOMAIN_URL}`)" # domain to expose on
+
+    networks:
+      - traefik-proxy

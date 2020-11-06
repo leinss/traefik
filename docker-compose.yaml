@@ -74,5 +74,3 @@ networks:
   traefik-proxy:
     name: traefik-proxy
     external: true
-# volumes:
-#   nodejs-node_modules:

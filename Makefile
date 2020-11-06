@@ -8,7 +8,7 @@ dev:
 
 prod: 
 	@echo "start prod mode"
-	docker-compose --env-file ./config/.env.prod -f docker-compose.yaml -f docker-compose.prod.yaml up
+	docker-compose --env-file ./config/.env.prod -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 
 stop: 
 	@echo "stop containers"

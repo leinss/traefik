@@ -1,0 +1,33 @@
+version: "3.5"
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:latest
+    restart: unless-stopped
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # <== Volume for docker admin
+      - ./config:/config # <== Volume for configs (TLS)
+      - ./config/traefik.dev.yaml:/etc/traefik/traefik.yaml
+      - ./config/dynamic.yaml:/dynamic.yaml # <== Volume for dynamic conf file
+
+    labels:
+      #### Labels define the behavior and rules of the traefik proxy for this container ####
+      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+      - "traefik.http.routers.traefik.rule=Host(`monitor.${DOMAIN_URL}`)" # <== Setting the domain for the dashboard
+      - "traefik.http.routers.traefik.service=api@internal" # <== Enabling the api to be a service to access
+      
+      # - "traefik.http.routers.traefik.middlewares=auth" # enable password auth
+      # - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$Dqo7TC2B$$23bAWltXXzx01XUbq2BU50" # substitute with your htpasswd string and escape dollar signs!
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    networks:
+      - traefik-proxy # <== Placing traefik on the network named traefik-proxy, to access containers on this network
+
+networks:
+  traefik-proxy:
+    name: traefik-proxy
+    external: true

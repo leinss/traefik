@@ -1,21 +1,5 @@
 version: "3.5"
 services:
-  traefik:
-    volumes:
-      - ./config/traefik.yaml:/etc/traefik/traefik.yaml
-      - ./config/dynamic.yaml:/dynamic.yaml # <== Volume for dynamic conf file
-
-    labels:
-      #### Labels define the behavior and rules of the traefik proxy for this container ####
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=mytlschallenge"
-      # - "traefik.http.routers.traefik.middlewares=auth" # enable password auth
-      # - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$Dqo7TC2B$$23bAWltXXzx01XUbq2BU50" # substitute with your htpasswd string and escape dollar signs!
-
-    ports:
-      - "80:80"
-      - "443:443"
-
   nodejs:
     build: ./nodejs
 

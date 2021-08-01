@@ -9,7 +9,7 @@ services:
       - url=https://blog.${DOMAIN_URL}
 
     volumes:
-      - /data:/var/lib/ghost/content
+      - ./data:/var/lib/ghost/content
 
     labels:
       - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
@@ -20,3 +20,7 @@ services:
 
     networks:
       - traefik-proxy
+
+networks:
+  traefik-proxy:
+    external: true

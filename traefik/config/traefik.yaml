@@ -1,7 +1,7 @@
 log:
   # Log Settings (options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO)
   # https://docs.traefik.io/observability/logs/
-  level: DEBUG
+  level: ERROR
 
 # Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
 entryPoints:
@@ -24,7 +24,7 @@ certificatesResolvers:
       storage: "/config/acme.json"
       tlsChallenge: {}
       # during development
-      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
+      # caserver: https://acme-staging-v02.api.letsencrypt.org/directory
 
 api:
   insecure: true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION

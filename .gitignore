@@ -3,3 +3,5 @@
 */config/.env.dev
 */config/.env.prod
 .env
+ghost_*
+*/data/*

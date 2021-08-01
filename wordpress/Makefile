@@ -22,3 +22,4 @@ deploy:
 logs: 
 	@echo $(ACME_EMAIL)
 	@docker-compose logs -f
+

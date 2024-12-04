@@ -1,0 +1,18 @@
+serverAddr = "your_server_ip"
+serverPort = 7000             # Main FRP connection port
+auth.token = "your_token"     # from frps.toml
+loginFailExit = false
+
+webServer.addr = "0.0.0.0"
+# webServer.addr = "127.0.0.1"
+webServer.port = 7400
+webServer.user = "admin"   # change this
+webServer.password = "pwd" # change this
+
+[[proxies]]
+name = "webserver"
+type = "tcp"
+localPort = 8000
+remotePort = 1234              # only has to specified in the client
+transport.useEncryption = true # only has to specified in the client
+# transport.useCompression = true # only has to specified in the clientƒ

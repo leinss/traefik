@@ -1,0 +1,44 @@
+http:
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "admin:your_token"
+
+    redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true # Sends a 301 permanent redirect
+
+  routers:
+    to-web:
+      entryPoints:
+        - web
+      rule: "Host(`your_domain`)"
+      service: app
+      middlewares:
+        - redirect
+
+    to-websecure:
+      entryPoints:
+        - websecure
+      rule: "Host(`your_domain`)"
+      service: app
+      tls:
+        certResolver: letsencrypt
+
+    traefik-dashboard:
+      entryPoints:
+        - traefik
+      rule: "Host(`your_domain`)" # Accessible at host...:8080
+      service: api@internal
+      middlewares:
+        - auth
+
+  services:
+    app:
+      loadBalancer:
+        servers:
+          #- url: "http://127.0.0.1:8000" # Your local service
+          - url: "http://172.17.0.1:8000" # docker gateway
+          # - url: "http://host.docker.internal:8000"  # Use the host IP or host.docker.internal for macOS/Windows

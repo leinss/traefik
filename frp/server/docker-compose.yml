@@ -1,0 +1,14 @@
+services:
+  frps:
+    image: fatedier/frps:v0.61.0
+    container_name: frps
+    # network_mode: host
+    volumes:
+      - ./frps.toml:/etc/frp/frps.toml
+    entrypoint: ["/usr/bin/frps"]
+    command: ["-c", "/etc/frps.toml"]
+    restart: unless-stopped
+    ports:
+      - "7000:7000" # Main FRP connection port
+      - "7500:7500" # Dashboard port
+      # add frpc ports here, which are exposed to the internet!!

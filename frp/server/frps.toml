@@ -1,0 +1,20 @@
+bindPort = 7000           # Main FRP connection port
+auth.token = "your_token"
+# create token with
+# head -c 32 /dev/urandom | base64
+# or
+# openssl rand -base64 32
+
+# The default value is 127.0.0.1. Change it to 0.0.0.0 when you want to access it from a public network.
+webServer.addr = "0.0.0.0"
+webServer.port = 7500      # Dashboard port
+# dashboard's username and password are both optional
+webServer.user = "admin"   # change this
+webServer.password = "pwd" # change this
+
+enablePrometheus = true
+
+# transport.tls.force = true
+# transport.tls.certFile = "certificate.crt"
+# transport.tls.keyFile = "certificate.key"
+# transport.tls.trustedCaFile = "ca.crt"

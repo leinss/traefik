@@ -1,0 +1,14 @@
+[Unit]
+Description=Python Hello World Web Server
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/webserver
+# Environment="PATH=/home/ubuntu/.pyenv/versions/hello-world-env/bin"
+ExecStart=/home/ubuntu/.pyenv/versions/hello-world-env/bin/python /home/ubuntu/webserver/server.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

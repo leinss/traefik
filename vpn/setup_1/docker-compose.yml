@@ -1,0 +1,41 @@
+services:
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    image: traefik:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+    environment:
+      TZ: Europe/Berlin
+      NAMESILO_API_KEY: "" # enter
+    volumes:
+      #- traefik-acme:/acme
+      - /data/traefik:/acme
+      - ./config/traefik.yml:/traefik.yml
+      - ./config/dynamic:/dynamic
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik
+    labels:
+      # Watchtower
+      com.centurylinklabs.watchtower.enable: true
+      # Traefik
+      traefik.enable: true
+      traefik.http.routers.traefik.entrypoints: websecure
+      traefik.http.routers.traefik.rule: Host(`domain.xyz:8080`)
+      traefik.http.routers.traefik.priority: 100 # needed for traefik dashboard to work
+      traefik.http.routers.traefik.tls: true
+      traefik.http.routers.traefik.tls.certresolver: namesilo 
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.middlewares: simpleAuth@file
+      traefik.http.routers.traefik.tls.domains[0].main: "domain.xyz"
+      traefik.http.routers.traefik.tls.domains[0].sans: "*.domain.xyz"
+
+networks:
+  traefik:
+    name: traefik

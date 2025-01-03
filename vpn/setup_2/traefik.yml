@@ -1,0 +1,41 @@
+# https://raw.githubusercontent.com/traefik/traefik/v3.1/traefik.sample.yml
+
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: :80
+
+  websecure:
+    address: :443
+
+  traefik:
+    address: :8008
+
+log:
+  level: INFO
+
+api:
+  insecure: false
+  dashboard: true
+
+providers:
+  file:
+    watch: true
+    filename: /etc/traefik/dynamic.yml
+  docker:
+    watch: true
+    network: traefik
+    exposedByDefault: false
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: email@example.xyz
+      storage: /etc/traefik/acme.json
+      dnsChallenge:
+        provider: namesilo
+        delayBeforeCheck: 900
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory  # Staging environment

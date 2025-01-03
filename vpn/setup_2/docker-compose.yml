@@ -1,0 +1,38 @@
+services:
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    image: traefik:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80" # Expose HTTP
+      - "443:443" # Expose HTTPS
+      - "8008:8008" # Traefik dashboard
+    environment:
+      TZ: Asia/Bangkok
+      NAMESILO_API_KEY: "" # enter
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./dynamic/config.yml:/etc/traefik/dynamic.yml:ro"
+      - "./acme.json:/etc/traefik/acme.json"
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # network_mode: "host"  # Use the host network
+    networks:
+      - traefik
+    command:
+      - "--api.insecure=true" # Enable Traefik dashboard (remove in production)
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+        # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+        # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+        # - "--entrypoints.websecure.http.tls.certresolver=letsencrypt"
+
+networks:
+  traefik:
+    driver: bridge
+    name: traefik_traefik

@@ -26,15 +26,11 @@ services:
       com.centurylinklabs.watchtower.enable: true
       # Traefik
       traefik.enable: true
-      traefik.http.routers.traefik.entrypoints: websecure
-      traefik.http.routers.traefik.rule: Host(`domain.xyz:8080`)
-      traefik.http.routers.traefik.priority: 100 # needed for traefik dashboard to work
-      traefik.http.routers.traefik.tls: true
-      traefik.http.routers.traefik.tls.certresolver: namesilo 
-      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.entrypoints: traefik
+      traefik.http.routers.traefik.rule: PathPrefix(`/`)
+      traefik.http.routers.traefik.tls: false
       traefik.http.routers.traefik.middlewares: simpleAuth@file
-      traefik.http.routers.traefik.tls.domains[0].main: "domain.xyz"
-      traefik.http.routers.traefik.tls.domains[0].sans: "*.domain.xyz"
+      traefik.http.routers.traefik.service: api@internal
 
 networks:
   traefik:
